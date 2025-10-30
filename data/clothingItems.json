@@ -1,0 +1,5 @@
+[
+  { "id": 1, "name": "T-shirt", "category": "Top", "color": "Blue" },
+  { "id": 2, "name": "Jeans", "category": "Bottom", "color": "Black" },
+  { "id": 3, "name": "Sneakers", "category": "Footwear", "color": "White" }
+]
