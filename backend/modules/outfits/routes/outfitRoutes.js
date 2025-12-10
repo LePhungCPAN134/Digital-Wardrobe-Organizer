@@ -4,11 +4,12 @@ const { getAllOutfits, getOutfitByID, addNewOutfit, updateExistingOutfit, delete
 const { createOutfitRules } = require("../middlewares/create-outfit-rules");
 const { updateOutfitRules } = require("../middlewares/update-outfit-rules");
 const { validationResult } = require("express-validator");
+const authorize = require("../../../shared/middlewares/authorize");
 
 /**
  * GET /outfits - Fetch all outfits
  */
-router.get("/outfits", async (req, res) => {
+router.get("/outfits", authorize(["customer", "admin"]), async (req, res) => {
   try {
     const outfits = await getAllOutfits();
     res.json(outfits || []);
@@ -20,7 +21,7 @@ router.get("/outfits", async (req, res) => {
 /**
  * GET /outfits/:id - Fetch outfit by ID
  */
-router.get("/outfits/:id", async (req, res) => {
+router.get("/outfits/:id", authorize(["customer", "admin"]), async (req, res) => {
   try {
     const outfit = await getOutfitByID(req.params.id);
     if (!outfit) return res.status(404).json({ error: "Outfit not found." });
@@ -33,13 +34,12 @@ router.get("/outfits/:id", async (req, res) => {
 /**
  * POST /outfits - Add new outfit
  */
-router.post("/outfits", createOutfitRules, async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+router.post("/outfits", authorize(["customer", "admin"]), createOutfitRules, async (req, res) => {
   try {
     const newOutfit = await addNewOutfit(req.body);
     res.status(201).json(newOutfit);
   } catch (error) {
+    console.error(error);
     res.status(500).json({ error: "Server error." });
   }
 });
@@ -47,9 +47,7 @@ router.post("/outfits", createOutfitRules, async (req, res) => {
 /**
  * PUT /outfits/:id - Update outfit
  */
-router.put("/outfits/:id", updateOutfitRules, async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+router.put("/outfits/:id", authorize(["customer", "admin"]), updateOutfitRules, async (req, res) => {
   try {
     const updatedOutfit = await updateExistingOutfit(req.params.id, req.body);
     res.json(updatedOutfit);
@@ -61,7 +59,7 @@ router.put("/outfits/:id", updateOutfitRules, async (req, res) => {
 /**
  * DELETE /outfits/:id - Delete outfit
  */
-router.delete("/outfits/:id", async (req, res) => {
+router.delete("/outfits/:id", authorize(["customer", "admin"]), async (req, res) => {
   try {
     const deletedOutfit = await deleteOutfit(req.params.id);
     res.json(deletedOutfit);

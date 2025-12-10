@@ -1,15 +1,29 @@
 //Import mongoose library
 const mongoose = require("mongoose");
+const { encodePassword } = require("../../../shared/password-utils");
 
-//Create a new schema for user
-const UserSchema = new mongoose.Schema({
-    name: { type: String, required: true, minlength: 3 },
+//Create user scheema
+const userSchema = new mongoose.Schema(
+  {
+    name: String,
     email: { type: String, required: true, unique: true },
-    createdAt: { type: mongoose.Schema.Types.Date, default: Date.now() }
+    phone: { type: String },
+    password: { type: String, required: true },
+    address: String,
+    createdAt: { type: Date, default: Date.now() },
+    //Add role-based access control
+    roles: { type: [String], enum: ["admin", "customer"], required: true, default: ["customer"] },
+  },
+  { versionKey: false }
+);
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) next();
+  this.password = encodePassword(this.password);
+  next();
 });
 
-//Create user model
-const UserModel = new mongoose.model("User", UserSchema);
+const UserModel = mongoose.model("User", userSchema);
 
 //Get all user
 async function getAllUsers() {

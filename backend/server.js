@@ -21,6 +21,8 @@ server.use(cors({ origin: "http://localhost:5173" }));
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 
+server.use(cookieParser()); 
+
 //Add the connectDB middleware in application level
 server.use(connectDB);
 
