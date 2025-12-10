@@ -1,13 +1,12 @@
+//// Import and configure the 'dotenv' package at the top of server.js to load environment variables.
 require('dotenv').config();
 
 const express = require("express");
-
 const cors = require("cors");
-
-// Import route modules based on your folder structure
-const userRoutes = require("./modules/users/routes/userRoutes");
-const clothingRoutes = require("./modules/clothingItems/routes/clothingRoutes");
-const outfitRoutes = require("./modules/outfits/routes/outfitRoutes");
+const cookieParser = require("cookie-parser");
+const { userRoutes } = require("../backend/modules/users/routes/userRoutes");
+const clothingRoutes = require("../backend/modules/clothingItems/routes/clothingRoutes");
+const outfitRoutes = require("../backend/modules/outfits/routes/outfitRoutes");
 const connectDB = require("./shared/connect-db");
 
 const port = 3000;
@@ -21,6 +20,7 @@ server.use(cors({ origin: "http://localhost:5173" }));
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 
+// middlewares to parse request cookies in application-level
 server.use(cookieParser()); 
 
 //Add the connectDB middleware in application level
@@ -32,9 +32,9 @@ server.use(clothingRoutes);
 server.use(outfitRoutes);
 
 // error-handling middleware to logs the error for debugging.
-server.use((err, req, res, next) => {
-  console.error("Server error: ", err.stack);
-  res.status(500).send("Something went wrong with the server.");
+server.use((error, req, res, next) => {
+  console.log(error);
+  res.status(500).send("Oops! Internal server error!");
 });
 
 // Middleware to handle route not found error.
@@ -46,4 +46,3 @@ server.listen(port, hostname, (error) => {
   if (error) console.log(error.message);
   else console.log(`Server running on http://${hostname}:${port}`);
 });
-``

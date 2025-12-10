@@ -1,5 +1,6 @@
 const { body } = require("express-validator");
 const mongoose = require("mongoose");
+const checkValidation = require("../../../shared/middlewares/check-validation");
 
 /**
  * Validation rules for updating an outfit.
@@ -7,8 +8,10 @@ const mongoose = require("mongoose");
 const updateOutfitRules = [
   body("name")
     .optional()
-    .isString().withMessage("Name must be a string")
-    .isLength({ min: 3 }).withMessage("Name must be at least 3 characters long"),
+    .isString()
+    .withMessage("Name must be a string")
+    .isLength({ min: 3 })
+    .withMessage("Name must be at least 3 characters long"),
 
   body("items")
     .optional()
@@ -20,8 +23,12 @@ const updateOutfitRules = [
 
   body("occasion")
     .optional()
-    .isString().withMessage("Occasion must be a string")
-    .isLength({ min: 3 }).withMessage("Occasion must be at least 3 characters long")
+    .isString()
+    .withMessage("Occasion must be a string")
+    .isLength({ min: 3 })
+    .withMessage("Occasion must be at least 3 characters long"),
+
+  checkValidation,
 ];
 
-module.exports = { updateOutfitRules };
+module.exports = updateOutfitRules;

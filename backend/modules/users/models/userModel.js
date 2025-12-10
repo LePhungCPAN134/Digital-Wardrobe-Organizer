@@ -1,4 +1,3 @@
-//Import mongoose library
 const mongoose = require("mongoose");
 const { encodePassword } = require("../../../shared/password-utils");
 

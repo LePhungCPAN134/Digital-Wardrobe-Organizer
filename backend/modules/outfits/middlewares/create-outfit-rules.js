@@ -1,13 +1,16 @@
 const { body } = require("express-validator");
 const mongoose = require("mongoose");
+const checkValidation = require("../../../shared/middlewares/check-validation");
 
 /**
  * Validation rules for creating an outfit.
  */
 const createOutfitRules = [
   body("name")
-    .isString().withMessage("Name must be a string")
-    .isLength({ min: 3 }).withMessage("Name must be at least 3 characters long"),
+    .isString()
+    .withMessage("Name must be a string")
+    .isLength({ min: 3 })
+    .withMessage("Name must be at least 3 characters long"),
 
   body("items")
     .isArray({ min: 1 })
@@ -18,7 +21,10 @@ const createOutfitRules = [
 
   body("occasion")
     .isString().withMessage("Occasion must be a string")
-    .isLength({ min: 3 }).withMessage("Occasion must be at least 3 characters long")
+    .isLength({ min: 3 })
+    .withMessage("Occasion must be at least 3 characters long"),
+
+  checkValidation,
 ];
 
-module.exports = { createOutfitRules };
+module.exports = createOutfitRules;

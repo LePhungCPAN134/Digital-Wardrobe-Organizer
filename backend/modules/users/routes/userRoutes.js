@@ -1,5 +1,4 @@
-const express = require("express");
-const usersRoute = express.Router();
+const { Router } = require("express");
 
 const registerRules = require("../middlewares/register-rules");
 const loginRules = require("../middlewares/login-rules");
@@ -14,6 +13,8 @@ const { encodeToken } = require("../../../shared/jwt-utils");
 const authorize = require("../../../shared/middlewares/authorize");
 const { randomNumberOfNDigits } = require("../../../shared/compute-utils");
 const sendEmail = require("../../../shared/email-utils");
+
+const usersRoute = Router();
 
 /**
  * Register Route (public)
@@ -201,4 +202,4 @@ usersRoute.delete("/accounts/:id", authorize(["admin"]), async (req, res) => {
   }
 );
 
-module.exports = usersRoute;
+module.exports = { usersRoute };

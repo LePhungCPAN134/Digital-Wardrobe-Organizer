@@ -1,53 +1,50 @@
-const express = require("express");
-const router = express.Router();
-const { getAllClothingItems, getClothingItemByID, addNewClothingItem, updateExistingClothingItem, deleteClothingItem } = require("../models/clothingModel");
-const { createClothingItemRules } = require("../middlewares/create-clothing-rules");
-const { updateClothingItemRules } = require("../middlewares/update-clothing-rules");
-const { validationResult } = require("express-validator");
+const { Router } = require("express");
+const ClothingModel = require("../models/clothingModel");
+const createClothingRules = require("../middlewares/create-clothing-rules");
+const updateClothingRules = require("../middlewares/update-clothing-rules");
+const validationResult = require("express-validator");
 const authorize = require("../../../shared/middlewares/authorize");
+
+const clothingRoute = Router();
 
 /**
  * GET /clothingItems - Fetch all clothing items
  * Protected: customer or admin
  */
-router.get("/clothingItems", authorize(["customer", "admin"]), async (req, res) => {
-  try {
-    const items = await getAllClothingItems();
-    res.json(items || []);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error." });
-  }
+clothingRoute.get("/clothingItems", authorize(["customer", "admin"]), async (req, res) => {
+    const allClothing = await ClothingModel.find();
+    if (!allClothing) res.json([]);
+    else res.json(allClothing);
 });
 
 /**
  * GET /clothingItems/:id - Fetch clothing item by ID
  * Protected: customer or admin
  */
-router.get("/clothingItems/:id", authorize(["customer", "admin"]), async (req, res) => {
-  try {
-    const item = await getClothingItemByID(req.params.id);
-    if (!item) return res.status(404).json({ error: "Clothing item not found." });
-    res.json(item);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Server error." });
-  }
+clothingRoute.get("/clothingItems/:id", authorize(["customer", "admin"]), async (req, res) => {
+    const clothingID = req.params.id;
+    const clothing = await ClothingModel.findById(clothingID);
+    if (!clothing) return res.status(404).send("Clothing not found!");
+    else res.status(200).json(clothing);
 });
 
 /**
  * POST /clothingItems - Add new clothing item
  * Protected: customer or admin
  */
-router.post(
-  "/clothingItems",
-  authorize(["customer", "admin"]), createClothingItemRules, async (req, res) => {
+clothingRoute.post("/clothingItems", authorize(["customer", "admin"]), createClothingRules, async (req, res) => {
     try {
-      const newItem = await addNewClothingItem(req.body);
-      res.status(201).json(newItem);
+      const { name, category, color, imageUrl } = req.body;
+      const clothing = new ClothingModel({
+        name,
+        category,
+        color,
+        imageUrl,
+      });
+      const savedClothing = await clothing.save();
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Server error." });
+      console.error("Error creating clothing: ", error);
+      res.status(500).send("Failed to create new clothing data!");
     }
   }
 );
@@ -56,31 +53,42 @@ router.post(
  * PUT /clothingItems/:id - Update clothing item
  * Protected: customer or admin
  */
-router.put(
-  "/clothingItems/:id", authorize(["customer", "admin"]), updateClothingItemRules, async (req, res) => {
-    try {
-      const updatedItem = await updateExistingClothingItem(req.params.id, req.body);
-      res.json(updatedItem);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Server error." });
+clothingRoute.put(
+  "/clothingItems/:id", authorize(["customer", "admin"]), updateClothingRules, async (req, res) => {
+  try {
+    const updatedClothing = await ClothingModel.findByIdAndUpdate (
+      clothingID,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedClothing) {
+      return res.status(404).send("Clothing not found!");
     }
+
+    res.status(200).json(updatedClothing);
+  } catch (error) {
+    console.error("error updating clothing: ", error);
+    res.status(500).send("Failed to update clothing data!");
   }
-);
+});
 
 /**
  * DELETE /clothingItems/:id - Delete clothing item
  * Protected: customer or admin
  */
-router.delete("/clothingItems/:id", authorize(["customer", "admin"]), async (req, res) => {
-    try {
-      const deletedItem = await deleteClothingItem(req.params.id);
-      res.json(deletedItem);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Server error." });
+clothingRoute.delete("/clothingItems/:id", authorize(["customer", "admin"]), async (req, res) => {
+  const clothingID = req.params.id;
+  try {
+    const deletedClothing = await ClothingModel.findByIdAndDelete(clothingID);
+    if (!deletedClothing) {
+      return res.status(404).send("Clothing not found!");
     }
+    res.status(200).json(deletedClothing);
+  } catch (error) {
+    console.eerror("Error deleting clothing: ", error);
+    res.status(500).send("Failed to delete clothing data!")
   }
-);
+});
 
-module.exports = router;
+module.exports = { clothingRoute };
