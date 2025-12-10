@@ -2,6 +2,8 @@ require('dotenv').config();
 
 const express = require("express");
 
+const cors = require("cors");
+
 // Import route modules based on your folder structure
 const userRoutes = require("./modules/users/routes/userRoutes");
 const clothingRoutes = require("./modules/clothingItems/routes/clothingRoutes");
@@ -12,8 +14,10 @@ const port = 3000;
 const hostname = "localhost";
 const server = express();
 
-//Add built-in middlewares to parse request body in application-level
+//Allow frontend
+server.use(cors({ origin: "http://localhost:5173" }));
 
+//Add built-in middlewares to parse request body in application-level
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
 
