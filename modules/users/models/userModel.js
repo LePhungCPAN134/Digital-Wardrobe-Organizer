@@ -1,67 +1,54 @@
-/**
- * Handles CRUD operations for Users using JSON file as data source.
- */
-const { readFile, writeToFile } = require("../../../shared/file-utils");
-const filePath = "./data/users.json";
+//Import mongoose library
+const mongoose = require("mongoose");
 
-/**
- * Get all users.
- * @returns {Promise<Array>} List of users.
- */
+//Create a new schema for user
+const UserSchema = new mongoose.Schema({
+    name: { type: String, required: true, minlength: 3 },
+    email: { type: String, required: true, unique: true },
+    createdAt: { type: mongoose.Schema.Types.Date, default: Date.now() }
+});
+
+//Create user model
+const UserModel = new mongoose.model("User", UserSchema);
+
+//Get all user
 async function getAllUsers() {
-  return readFile(filePath);
+  return UserModel.find().lean();
 }
 
-/**
- * Get user by ID.
- * @param {number|string} userID
- * @returns {Promise<Object|undefined>}
- */
+//Get user by ID
 async function getUserByID(userID) {
   if (!userID) throw new Error(`Cannot use ${userID} to get user`);
   const users = await getAllUsers();
   return users.find(user => user.id === Number(userID));
 }
 
-/**
- * Add new user.
- * @param {Object} newUser
- * @returns {Promise<Object>}
- */
+//Add new user
 async function addNewUser(newUser) {
   if (!newUser) throw new Error(`Cannot use ${newUser} to add user`);
-  const users = await getAllUsers();
-  newUser = { id: users.length + 1, ...newUser };
-  users.push(newUser);
-  await writeToFile(filePath, users);
-  return newUser;
+  const created = await UserModel.create(newUser);
+  return created.toObject();
 }
 
-/**
- * Update existing user.
- */
+//Update existing user
 async function updateExistingUser(userID, newUser) {
   if (!userID || !newUser) throw new Error(`Cannot update user`);
-  const users = await getAllUsers();
-  const index = users.findIndex(u => u.id === Number(userID));
-  if (index < 0) throw new Error(`User with ${userID} doesn't exist`);
-  const updatedUser = { ...users[index], ...newUser };
-  users[index] = updatedUser;
-  await writeToFile(filePath, users);
-  return updatedUser;
+  const updated = await UserModel.findByIdAndUpdate(
+    userID,
+    newUser,
+    { new: true, runValidators: true }
+  ).lean();
+
+  if (!updated) throw new Error(`User with ${userID} doeesn't exist`);
+  return updated;
 }
 
-/**
- * Delete user.
- */
+//Delete user
 async function deleteUser(userID) {
   if (!userID) throw new Error(`Cannot delete user`);
-  const users = await getAllUsers();
-  const index = users.findIndex(u => u.id === Number(userID));
-  if (index < 0) throw new Error(`User with ${userID} doesn't exist`);
-  const [deletedUser] = users.splice(index, 1);
-  await writeToFile(filePath, users);
-  return deletedUser;
+  const deleted = await UserModel.findByIdAndDelete(userID).lean();
+  if (!deleted) throw new Error(`User with ${userID} doeesn't exist`);
+  return deleted;
 }
 
-module.exports = { getAllUsers, getUserByID, addNewUser, updateExistingUser, deleteUser };
+module.exports = { getAllUsers, getUserByID, addNewUser, updateExistingUser, deleteUser, UserModel };

@@ -1,68 +1,65 @@
-/**
- * Handles CRUD operations for Clothing Items using JSON file as data source.
- */
-const { readFile, writeToFile } = require("../../../shared/file-utils");
-const filePath = "./data/clothingItems.json";
+//Import mongoose library
+const mongoose = require("mongoose");
+
+//Create a new schema for clothing
+const ClothingSchema = new mongoose.Schema({
+    name: { type: String, required: true, minlength: 3 },
+    category: { type: String, required: true },
+    color: { type: String, requirede: true, minlength: 3 },
+    imageUrl: { type: String, required: false },
+    createdAt: { type: mongoose.Schema.Types.Date, default: Date.now() }
+});
+
+//Create clothing model
+const ClothingModel = new mongoose.model("Clothing", ClothingSchema);
 
 /**
  * Get all clothing items.
  */
 async function getAllClothingItems() {
-  return readFile(filePath);
+  return ClothingModel.find().lean();
 }
 
 /**
  * Get clothing item by ID.
  */
-async function getClothingItemByID(itemID) {
-  if (!itemID) throw new Error(`Cannot use ${itemID} to get clothing item`);
-  const items = await getAllClothingItems();
-  return items.find(item => item.id === Number(itemID));
+async function getClothingItemByID(clothingID) {
+  if (!clothingID) throw new Error(`Cannot use ${clothingID} to get clothing item`);
+  return ClothingModel.findById(clothingID).lean();
 }
 
 /**
  * Add new clothing item.
  */
-async function addNewClothingItem(newItem) {
-  if (!newItem) throw new Error(`Cannot use ${newItem} to add clothing item`);
-  const items = await getAllClothingItems();
-  newItem = { id: items.length + 1, ...newItem };
-  items.push(newItem);
-  await writeToFile(filePath, items);
-  return newItem;
+async function addNewClothingItem(newClothing) {
+  if (!newClothing) throw new Error(`Cannot use ${newClothing} to add clothing`);
+  const created = await ClothingModel.create(newClothing);
+  return created.toObject();
 }
 
 /**
  * Update existing clothing item.
  */
-async function updateExistingClothingItem(itemID, newItem) {
-  if (!itemID || !newItem) throw new Error(`Cannot update clothing item`);
-  const items = await getAllClothingItems();
-  const index = items.findIndex(i => i.id === Number(itemID));
-  if (index < 0) throw new Error(`Clothing item with ${itemID} doesn't exist`);
-  const updatedItem = { ...items[index], ...newItem };
-  items[index] = updatedItem;
-  await writeToFile(filePath, items);
-  return updatedItem;
+async function updateExistingClothingItem(clothingID, newClothing) {
+  if (!clothingID || !newClothing) throw new Error(`Cannot update clothing item`);
+  const updated = await ClothingModel.findByIdAndUpdate(
+    clothingID,
+    newClothing,
+    { new: true, runValidators: true }
+  ).lean();
+
+  if (!updated) throw new Error(`Outfit with ${outfitID} doesn't exist`);
+  return updated;
 }
 
 /**
  * Delete clothing item.
  */
-async function deleteClothingItem(itemID) {
-  if (!itemID) throw new Error(`Cannot delete clothing item`);
-  const items = await getAllClothingItems();
-  const index = items.findIndex(i => i.id === Number(itemID));
-  if (index < 0) throw new Error(`Clothing item with ${itemID} doesn't exist`);
-  const [deletedItem] = items.splice(index, 1);
-  await writeToFile(filePath, items);
-  return deletedItem;
+async function deleteClothingItem(newClothing) {
+  if (!newClothing) throw new Error(`Cannot delete clothing item`);
+  const deleted = await ClothingModel.findByIdAndDelete(clothingID).lean();
+  if (!deleted) throw new Error(`Outfit with ${clothingID} doesn't exist`);
+  return deleted;
 }
 
-module.exports = {
-  getAllClothingItems,
-  getClothingItemByID,
-  addNewClothingItem,
-  updateExistingClothingItem,
-  deleteClothingItem
-};
+module.exports = { getAllClothingItems, getClothingItemByID, addNewClothingItem, updateExistingClothingItem, deleteClothingItem, ClothingModel };
