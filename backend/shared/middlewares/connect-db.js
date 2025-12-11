@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
-const dbUrl = process.env.DB_URI;
-const dbName = process.env.DB_NAME;
+const DB_URL = process.env.DB_URL;
+const DB_NAME = process.env.DB_NAME;
 
 console.log(dbUrl);
 
 async function connectDB(req, res, next) {
     try {
-        await mongoose.connect(dbUrl, { dbName });
+        await mongoose.connect(DB_URL, { dbName: DB_NAME });
         console.log("Database connected!");
         next();
     } catch (error) {

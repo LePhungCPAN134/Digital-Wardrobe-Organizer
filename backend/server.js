@@ -7,7 +7,7 @@ const cookieParser = require("cookie-parser");
 const { userRoutes } = require("../backend/modules/users/routes/userRoutes");
 const clothingRoutes = require("../backend/modules/clothingItems/routes/clothingRoutes");
 const outfitRoutes = require("../backend/modules/outfits/routes/outfitRoutes");
-const connectDB = require("./shared/connect-db");
+const connectDB = require("../backend/shared/middlewares/connect-db");
 
 const port = 3000;
 const hostname = "localhost";
