@@ -57,7 +57,7 @@ function OutfitList() {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div>
+    <div className="page-container">
       <h1>Outfits</h1>
       {message && <p>{message}</p>}
       

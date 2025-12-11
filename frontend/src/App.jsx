@@ -1,3 +1,4 @@
+import "./App.css";
 import { Routes, Route, Link } from "react-router-dom";
 import ClothingList from "./pages/ClothingList";
 import ClothingForm from "./pages/ClothingForm";
@@ -19,78 +20,116 @@ function App() {
   const isAdmin = user?.roles?.includes("admin");
 
   return (
-    <div>
-      <nav>
-        <Link to="/clothing">Closet</Link>{" "}
-        <Link to="/clothing/new">Add Clothing</Link>{" "}
-        <Link to="/outfits">Outfits</Link>{" "}
-        <Link to="/outfits/new">Add Outfit</Link>{" "}
-        <Link to="/login">Login</Link>{" "}
-        {user && (
-          <button type="button" onClick={handleLogout}>
-            Logout ({user.email})
-          </button>
-        )}
-      </nav>
+    <div className="app-shell">
+      {/* HEADER */}
+      <header className="app-header">
+        {/* Row 1: title + logout */}
+        <div className="app-header-top">
+          <h1 className="app-title">YOUR WARDROBE</h1>
 
-      <Routes>
-        {/* public routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/verify-otp" element={<OtpPage />} />
+          <div className="app-header-right">
+            {user && (
+              <button
+                type="button"
+                className="logout-btn"
+                onClick={handleLogout}
+              >
+                Logout ({user.email})
+              </button>
+            )}
+          </div>
+        </div>
 
-        {/* Clothing routes */}
-        <Route
-          path="/clothing"
-          element={
-            <ProtectedRoute>
-              <ClothingList />
-            </ProtectedRoute>
-          }
-        />
-        {/* Create new clothing */}
-        <Route
-          path="/clothing/new"
-          element={
-            <ProtectedRoute>
+        {/* Row 2: navigation links */}
+        <nav className="app-nav">
+          {/* "Closet" = clothing list */}
+          <Link to="/clothing" className="nav-link">
+            Closet
+          </Link>
+          <Link to="/clothing/new" className="nav-link">
+            Add Clothing
+          </Link>
+          <Link to="/outfits" className="nav-link">
+            Outfits
+          </Link>
+          <Link to="/outfits/new" className="nav-link">
+            Add Outfit
+          </Link>
+          {!user && (
+            <Link to="/login" className="nav-link">
+              Login
+            </Link>
+          )}
+        </nav>
+      </header>
+
+      {/* MAIN CONTENT */}
+      <main className="app-main">
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/verify-otp" element={<OtpPage />} />
+
+          <Route
+            path="/clothing"
+            element={
+              <ProtectedRoute>
+                <ClothingList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/clothing/new"
+            element={
+              <ProtectedRoute>
                 <ClothingForm />
-            </ProtectedRoute>
-          }
-        />
-        {/* edit existing clothing */}
-        <Route
-          path="/clothing/:id"
-          element={
-            <ProtectedRoute>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/clothing/:id"
+            element={
+              <ProtectedRoute>
                 <ClothingForm />
-            </ProtectedRoute>
-          }
-        />
-        {/* Outfits */}
-        <Route
-          path="/outfits"
-          element={
-            <ProtectedRoute>
-              <OutfitList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/outfits/new"
-          element={
-            <ProtectedRoute>
-              <OutfitForm />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/outfits/:id"
-          element={
-            <ProtectedRoute>
-              <OutfitForm />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/outfits"
+            element={
+              <ProtectedRoute>
+                <OutfitList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/outfits/new"
+            element={
+              <ProtectedRoute>
+                <OutfitForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/outfits/:id"
+            element={
+              <ProtectedRoute>
+                <OutfitForm />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* default route → closet */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <ClothingList />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </main>
     </div>
   );
 }

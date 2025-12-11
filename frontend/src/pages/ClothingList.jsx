@@ -57,13 +57,13 @@ function ClothingList() {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div>
+    <div className="page-container">
       <h1>Closet</h1>
 
       {message && <p>{message}</p>}
 
       {/* Search bar */}
-      <div style={{ marginBottom: "1rem" }}>
+      <div style={{ marginBottom: "0.5rem", fontSize: "0.85rem", opacity: 0.8 }}>
         <input
           type="text"
           placeholder="Search by name or category…"
