@@ -13,6 +13,7 @@ function ClothingList() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [search, setSearch] = useState("");
 
   async function loadItems() {
     try {
@@ -30,6 +31,16 @@ function ClothingList() {
   useEffect(() => {
     loadItems();
   }, []);
+
+  const filteredItems = items.filter((item) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+
+    const name = item.name?.toLowerCase() || "";
+    const category = item.category?.toLowerCase() || "";
+
+    return name.includes(q) || category.includes(q);
+  });  
 
   async function handleDelete(id) {
     if (!window.confirm("Delete this item?")) return;
@@ -51,10 +62,20 @@ function ClothingList() {
 
       {message && <p>{message}</p>}
 
-      {items.length === 0 ? (
-        <p>
-          No clothing items yet. <Link to="/clothing/new">Add one</Link>
-        </p>
+      {/* Search bar */}
+      <div style={{ marginBottom: "1rem" }}>
+        <input
+          type="text"
+          placeholder="Search by name or category…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ padding: "4px 8px", minWidth: "250px" }}
+        />
+      </div>  
+
+      {/* Filtered results */}
+      {filteredItems.length === 0 ? (
+        <p>No clothing items match your search.</p>
       ) : (
         <table border="1" cellPadding="8">
           <thead>
@@ -67,7 +88,7 @@ function ClothingList() {
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => {
+            {filteredItems.map((item) => {
               const src = getImageSrc(item);
               return (
                 <tr key={item._id}>

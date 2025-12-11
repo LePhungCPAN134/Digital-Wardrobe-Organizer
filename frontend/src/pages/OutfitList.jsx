@@ -2,10 +2,18 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchOutfits, deleteOutfit } from "../api/outfitApi";
 
+const getImageSrc = (imageUrl) => {
+  if (!imageUrl) return null;
+  return imageUrl.startsWith("http")
+    ? imageUrl
+    : `http://localhost:3000${imageUrl}`;
+};
+
 function OutfitList() {
   const [outfits, setOutfits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [search, setSearch] = useState(""); 
 
   async function loadOutfits() {
     try {
@@ -23,6 +31,16 @@ function OutfitList() {
   useEffect(() => {
     loadOutfits();
   }, []);
+
+  const filteredOutfits = outfits.filter((o) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+
+    const name = o.name?.toLowerCase() || "";
+    const occasion = o.occasion?.toLowerCase() || "";
+
+    return name.includes(q) || occasion.includes(q);
+  });  
 
   async function handleDelete(id) {
     if (!window.confirm("Delete this outfit?")) return;
@@ -42,10 +60,21 @@ function OutfitList() {
     <div>
       <h1>Outfits</h1>
       {message && <p>{message}</p>}
+      
+      {/* Search bar */}
+      <div style={{ marginBottom: "1rem" }}>
+        <input
+          type="text"
+          placeholder="Search by name or occasion…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ padding: "4px 8px", minWidth: "250px" }}
+        />
+      </div>  
 
-      {outfits.length === 0 ? (
+      {filteredOutfits.length === 0 ? (
         <p>
-          No outfits yet. <Link to="/outfits/new">Create one</Link>
+          No outfits match your search.{" "} <Link to="/outfits/new">Create one</Link>
         </p>
       ) : (
         <table border="1" cellPadding="8">
@@ -58,7 +87,7 @@ function OutfitList() {
             </tr>
           </thead>
           <tbody>
-            {outfits.map((o) => (
+            {filteredOutfits.map((o) => (
               <tr key={o._id}>
                 <td>{o.name}</td>
                 <td>{o.occasion}</td>
@@ -74,7 +103,7 @@ function OutfitList() {
                             <div key={id} style={{ textAlign: "center" }}>
                             {imageUrl ? (
                                 <img
-                                src={imageUrl}
+                                src={getImageSrc(imageUrl)}
                                 alt={name}
                                 style={{ width: "60px", height: "60px", objectFit: "cover" }}
                                 />
