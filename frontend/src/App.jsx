@@ -21,7 +21,7 @@ function App() {
   return (
     <div>
       <nav>
-        <Link to="/clothing">Clothing</Link>{" "}
+        <Link to="/clothing">Closet</Link>{" "}
         <Link to="/clothing/new">Add Clothing</Link>{" "}
         <Link to="/outfits">Outfits</Link>{" "}
         <Link to="/outfits/new">Add Outfit</Link>{" "}

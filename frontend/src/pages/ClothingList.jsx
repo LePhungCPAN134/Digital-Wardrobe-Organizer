@@ -58,7 +58,7 @@ function ClothingList() {
 
   return (
     <div>
-      <h1>Clothing Items</h1>
+      <h1>Closet</h1>
 
       {message && <p>{message}</p>}
 
@@ -73,9 +73,20 @@ function ClothingList() {
         />
       </div>  
 
+      {/* Results badge */}
+      <div style={{ marginBottom: "0.5rem", fontStyle: "italic" }}>
+        {search.trim() === "" ? (
+          <span>{items.length} total items</span>
+        ) : filteredItems.length > 0 ? (
+          <span>{filteredItems.length} results</span>
+        ) : (
+          <span>No results</span>
+        )}
+      </div>
+
       {/* Filtered results */}
       {filteredItems.length === 0 ? (
-        <p>No clothing items match your search.</p>
+        <p>No items match your search.</p>
       ) : (
         <table border="1" cellPadding="8">
           <thead>

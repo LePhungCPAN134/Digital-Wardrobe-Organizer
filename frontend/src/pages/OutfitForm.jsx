@@ -67,104 +67,109 @@ function OutfitForm() {
 
     setErrors(e);
     return Object.keys(e).length === 0;
-  }
-
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  }
-
-  function toggleItem(id) {
-    setForm((prev) => {
-      const exists = prev.items.includes(id);
-      return {
-        ...prev,
-        items: exists
-          ? prev.items.filter((x) => x !== id)
-          : [...prev.items, id],
-      };
-    });
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setMessage("");
-    if (!validate()) return;
-
-    try {
-      if (isEdit) {
-        await updateOutfit(id, form);
-        setMessage("Outfit updated.");
-      } else {
-        await createOutfit(form);
-        setMessage("Outfit created.");
-        setForm(initialForm);
-      }
-      setTimeout(() => navigate("/outfits"), 500);
-    } catch (err) {
-      console.error(err);
-      setMessage("Failed to save outfit.");
     }
-  }
 
-  return (
-    <div>
-      <h1>{isEdit ? "Edit Outfit" : "Create Outfit"}</h1>
-      {message && <p>{message}</p>}
+    function handleChange(e) {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+    }
 
-      <form onSubmit={handleSubmit}>
+    function toggleItem(id) {
+        setForm((prev) => {
+        const exists = prev.items.includes(id);
+        return {
+            ...prev,
+            items: exists
+            ? prev.items.filter((x) => x !== id)
+            : [...prev.items, id],
+        };
+        });
+    }
+
+    function handleCancel() {
+    navigate("/outfits");
+    }
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        setMessage("");
+        if (!validate()) return;
+
+        try {
+        if (isEdit) {
+            await updateOutfit(id, form);
+            setMessage("Outfit updated.");
+        } else {
+            await createOutfit(form);
+            setMessage("Outfit created.");
+            setForm(initialForm);
+        }
+        setTimeout(() => navigate("/outfits"), 500);
+        } catch (err) {
+        console.error(err);
+        setMessage("Failed to save outfit.");
+        }
+    }
+
+    return (
         <div>
-          <label>
-            Name:
-            <input
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-            />
-          </label>
-          {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
-        </div>
+        <h1>{isEdit ? "Edit Outfit" : "Create Outfit"}</h1>
+        {message && <p>{message}</p>}
 
-        <div>
-          <label>
-            Occasion:
-            <input
-              name="occasion"
-              value={form.occasion}
-              onChange={handleChange}
-            />
-          </label>
-          {errors.occasion && (
-            <p style={{ color: "red" }}>{errors.occasion}</p>
-          )}
-        </div>
+        <form onSubmit={handleSubmit}>
+            <div>
+            <label>
+                Name:
+                <input
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                />
+            </label>
+            {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
+            </div>
 
-        <div>
-          <p>Select clothing items:</p>
-          {errors.items && <p style={{ color: "red" }}>{errors.items}</p>}
-          {clothingOptions.length === 0 ? (
-            <p>No clothing available. Add some first.</p>
-          ) : (
-            <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-              {clothingOptions.map((item) => (
-                <li key={item._id}>
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={form.items.includes(item._id)}
-                      onChange={() => toggleItem(item._id)}
-                    />
-                    {" "}
-                    {item.name} ({item.category}, {item.color})
-                  </label>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+            <div>
+            <label>
+                Occasion:
+                <input
+                name="occasion"
+                value={form.occasion}
+                onChange={handleChange}
+                />
+            </label>
+            {errors.occasion && (
+                <p style={{ color: "red" }}>{errors.occasion}</p>
+            )}
+            </div>
 
-        <button type="submit">{isEdit ? "Update Outfit" : "Create Outfit"}</button>
-      </form>
+            <div>
+            <p>Select clothing items:</p>
+            {errors.items && <p style={{ color: "red" }}>{errors.items}</p>}
+            {clothingOptions.length === 0 ? (
+                <p>No clothing available. Add some first.</p>
+            ) : (
+                <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+                {clothingOptions.map((item) => (
+                    <li key={item._id}>
+                    <label>
+                        <input
+                        type="checkbox"
+                        checked={form.items.includes(item._id)}
+                        onChange={() => toggleItem(item._id)}
+                        />
+                        {" "}
+                        {item.name} ({item.category}, {item.color})
+                    </label>
+                    </li>
+                ))}
+                </ul>
+            )}
+            </div>
+
+            <button type="submit">{isEdit ? "Update Outfit" : "Create Outfit"}</button>
+            <button type="button" onClick={handleCancel} style={{ marginLeft: "0.5rem" }}>Cancel</button>
+        </form>
     </div>
   );
 }

@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  createClothingItem,
-  updateClothingItem,
-  fetchClothingItem,
-} from "../api/clothingApi";
+import { createClothingItem, updateClothingItem, fetchClothingItem } from "../api/clothingApi";
 
 const initialForm = {
   name: "",
@@ -44,6 +40,10 @@ function ClothingForm() {
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function handleCancel() {
+    navigate("/clothing");
   }
 
   function validate() {
@@ -170,6 +170,7 @@ function ClothingForm() {
         </div>
 
         <button type="submit">{isEdit ? "Update" : "Create"}</button>
+        <button type="button" onClick={handleCancel} style={{ marginLeft: "0.5rem" }}>Cancel</button>
       </form>
     </div>
   );
