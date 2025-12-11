@@ -28,7 +28,9 @@ const loginRules = [
     .withMessage(msg("emailInvalid"))
     .normalizeEmail(),
 
-  body("password").notEmpty().withMessage(msg("passwordRequired")),
+  body("password")
+    .notEmpty()
+    .withMessage(msg("passwordRequired")),
 
   checkValidation,
 ];

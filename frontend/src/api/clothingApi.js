@@ -11,8 +11,10 @@ export function fetchClothingItem(id) {
 }
 
 //POST
-export function createClothingItem(data) {
-  return api.post("/clothingItems", data);
+export function createClothingItem(formData) {
+  return api.post("/clothingItems", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 }
 
 //PUT

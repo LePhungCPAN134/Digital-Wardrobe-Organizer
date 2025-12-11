@@ -2,6 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchClothingItems, deleteClothingItem } from "../api/clothingApi";
 
+const getImageSrc = (item) => {
+  if (!item.imageUrl) return null;
+  if (item.imageUrl.startsWith("http")) return item.imageUrl;
+  // for uploaded files like "/uploads/filename.jpg"
+  return `http://localhost:3000${item.imageUrl}`;
+};
+
 function ClothingList() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +36,7 @@ function ClothingList() {
     try {
       await deleteClothingItem(id);
       setMessage("Item deleted successfully.");
-      setItems(prev => prev.filter(i => i._id !== id));
+      setItems((prev) => prev.filter((i) => i._id !== id));
     } catch (err) {
       console.error(err);
       setMessage("Failed to delete item.");
@@ -45,7 +52,9 @@ function ClothingList() {
       {message && <p>{message}</p>}
 
       {items.length === 0 ? (
-        <p>No clothing items yet. <Link to="/clothing/new">Add one</Link></p>
+        <p>
+          No clothing items yet. <Link to="/clothing/new">Add one</Link>
+        </p>
       ) : (
         <table border="1" cellPadding="8">
           <thead>
@@ -58,30 +67,33 @@ function ClothingList() {
             </tr>
           </thead>
           <tbody>
-            {items.map(item => (
-              <tr key={item._id}>
-                <td>{item.name}</td>
-                <td>{item.category}</td>
-                <td>{item.color}</td>
-                <td>
-                  {item.imageUrl ? (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      style={{ width: "60px" }}
-                    />
-                  ) : (
-                    "—"
-                  )}
-                </td>
-                <td>
-                  <Link to={`/clothing/${item._id}`}>Edit</Link>{" "}
-                  <button onClick={() => handleDelete(item._id)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+            {items.map((item) => {
+              const src = getImageSrc(item);
+              return (
+                <tr key={item._id}>
+                  <td>{item.name}</td>
+                  <td>{item.category}</td>
+                  <td>{item.color}</td>
+                  <td>
+                    {src ? (
+                      <img
+                        src={src}
+                        alt={item.name}
+                        style={{ width: "60px" }}
+                      />
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td>
+                    <Link to={`/clothing/${item._id}`}>Edit</Link>{" "}
+                    <button onClick={() => handleDelete(item._id)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       )}

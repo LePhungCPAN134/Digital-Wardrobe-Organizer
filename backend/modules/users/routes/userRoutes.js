@@ -5,7 +5,7 @@ const loginRules = require("../middlewares/login-rules");
 const verifyLoginRules = require("../middlewares/verify-login-rules");
 const updateAccountRules = require("../middlewares/update-account-rules");
 
-const UserModel = require("../models/userModel");
+const { UserModel } = require("../models/userModel");
 const OTPModel = require("../models/otpModel");
 
 const { matchPassword } = require("../../../shared/password-utils");

@@ -1,6 +1,7 @@
 //// Import and configure the 'dotenv' package at the top of server.js to load environment variables.
 require('dotenv').config();
 
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -24,6 +25,9 @@ server.use(express.urlencoded({ extended: true }));
 // middlewares to parse request cookies in application-level
 server.use(cookieParser()); 
 
+// Allow serving uploaded images
+server.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 //Add the connectDB middleware in application level
 server.use(connectDB);
 
@@ -32,7 +36,7 @@ server.use(userRoute);
 server.use(clothingRoute);
 server.use(outfitRoute);
 
-// error-handling middleware to logs the error for debugging.
+//Error-handling middleware to logs the error for debugging.
 server.use((error, req, res, next) => {
   console.log(error);
   res.status(500).send("Oops! Internal server error!");

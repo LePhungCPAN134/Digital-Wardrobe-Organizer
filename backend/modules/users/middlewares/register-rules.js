@@ -31,7 +31,11 @@ const msg =
     messages[req.cookies.lang || "EN"][key];
 
 const registerRules = [
-  body("name").optional().isString().withMessage(msg("nameString")).trim(),
+  body("name")
+    .optional()
+    .isString()
+    .withMessage(msg("nameString"))
+    .trim(),
 
   body("email")
     .notEmpty()

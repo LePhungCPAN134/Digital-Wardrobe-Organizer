@@ -10,7 +10,7 @@ const outfitRoute = Router();
  * GET /outfits - Fetch all outfits
  */
 outfitRoute.get("/outfits", authorize(["customer", "admin"]), async (req, res) => {
-  const allOutfits = await OutfitModel.find();
+  const allOutfits = await OutfitModel.find().populate("items").lean();
   if (!allOutfits) res.json([]);
   else res.json(allOutfits);
 });
@@ -20,7 +20,7 @@ outfitRoute.get("/outfits", authorize(["customer", "admin"]), async (req, res) =
  */
 outfitRoute.get("/outfits/:id", authorize(["customer", "admin"]), async (req, res) => {
   const outfitID = req.params.id;
-  const outfit = await OutfitModel.findById(outfitID);
+  const outfit = await OutfitModel.findById(outfitID).populate("items").lean();
   if (!outfitID) res.status(404).send("Outfit not found!");
   else res.status(200).json(outfit);
 });
@@ -54,7 +54,7 @@ outfitRoute.put("/outfits/:id", authorize(["customer", "admin"]), updateOutfitRu
       outfitID,
       req.body,
       { new: true, runValidators: true }
-    );
+    ).populate("items");
     if (!updatedOutfit) {
       return res.status(404).send("Outfit not found!");
     }

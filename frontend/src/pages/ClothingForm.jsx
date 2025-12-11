@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { createClothingItem, updateClothingItem, fetchClothingItem } from "../api/clothingApi";
+import {
+  createClothingItem,
+  updateClothingItem,
+  fetchClothingItem,
+} from "../api/clothingApi";
 
 const initialForm = {
   name: "",
@@ -13,6 +17,7 @@ function ClothingForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState(initialForm);
+  const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState("");
 
@@ -36,6 +41,11 @@ function ClothingForm() {
     })();
   }, [id, isEdit]);
 
+  function handleChange(e) {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  }
+
   function validate() {
     const newErrors = {};
 
@@ -53,7 +63,7 @@ function ClothingForm() {
       newErrors.color = "Color is required.";
     }
 
-    //Simple URL check
+    // Simple URL check for imageUrl
     if (form.imageUrl && !/^https?:\/\//i.test(form.imageUrl)) {
       newErrors.imageUrl = "Image URL should start with http:// or https://";
     }
@@ -62,28 +72,40 @@ function ClothingForm() {
     return Object.keys(newErrors).length === 0;
   }
 
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+  function handleFileChange(e) {
+    setFile(e.target.files[0] || null);
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setMessage("");
 
-    if (!validate()) return; //client-side validation
+    if (!validate()) return;
 
     try {
       if (isEdit) {
+        // edit stays JSON-only for now
         await updateClothingItem(id, form);
         setMessage("Item updated successfully.");
       } else {
-        await createClothingItem(form);
+        const data = new FormData();
+        data.append("name", form.name);
+        data.append("category", form.category);
+        data.append("color", form.color);
+
+        // send either imageUrl or file
+        if (file) {
+          data.append("image", file); // must match upload.single("image")
+        } else if (form.imageUrl) {
+          data.append("imageUrl", form.imageUrl);
+        }
+
+        await createClothingItem(data);
         setMessage("Item created successfully.");
         setForm(initialForm);
+        setFile(null);
       }
 
-      //After a short delay, go back to list
       setTimeout(() => navigate("/clothing"), 500);
     } catch (err) {
       console.error(err);
@@ -101,11 +123,7 @@ function ClothingForm() {
         <div>
           <label>
             Name:
-            <input
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-            />
+            <input name="name" value={form.name} onChange={handleChange} />
           </label>
           {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
         </div>
@@ -125,11 +143,7 @@ function ClothingForm() {
         <div>
           <label>
             Color:
-            <input
-              name="color"
-              value={form.color}
-              onChange={handleChange}
-            />
+            <input name="color" value={form.color} onChange={handleChange} />
           </label>
           {errors.color && <p style={{ color: "red" }}>{errors.color}</p>}
         </div>
@@ -143,12 +157,19 @@ function ClothingForm() {
               onChange={handleChange}
             />
           </label>
-          {errors.imageUrl && <p style={{ color: "red" }}>{errors.imageUrl}</p>}
+          {errors.imageUrl && (
+            <p style={{ color: "red" }}>{errors.imageUrl}</p>
+          )}
         </div>
 
-        <button type="submit">
-          {isEdit ? "Update" : "Create"}
-        </button>
+        <div>
+          <label>
+            Upload image:
+            <input type="file" accept="image/*" onChange={handleFileChange} />
+          </label>
+        </div>
+
+        <button type="submit">{isEdit ? "Update" : "Create"}</button>
       </form>
     </div>
   );

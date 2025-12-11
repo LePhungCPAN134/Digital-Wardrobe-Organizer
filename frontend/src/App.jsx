@@ -4,6 +4,8 @@ import ClothingForm from "./pages/ClothingForm";
 import LoginPage from "./pages/LoginPage";
 import OtpPage from "./pages/OtpPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import OutfitList from "./pages/OutfitList";
+import OutfitForm from "./pages/OutfitForm";
 
 function App() {
   function handleLogout() {
@@ -21,6 +23,8 @@ function App() {
       <nav>
         <Link to="/clothing">Clothing</Link>{" "}
         <Link to="/clothing/new">Add Clothing</Link>{" "}
+        <Link to="/outfits">Outfits</Link>{" "}
+        <Link to="/outfits/new">Add Outfit</Link>{" "}
         <Link to="/login">Login</Link>{" "}
         {user && (
           <button type="button" onClick={handleLogout}>
@@ -34,7 +38,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/verify-otp" element={<OtpPage />} />
 
-        {/* protected routes */}
+        {/* Clothing routes */}
         <Route
           path="/clothing"
           element={
@@ -43,7 +47,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* reate new clothing */}
+        {/* Create new clothing */}
         <Route
           path="/clothing/new"
           element={
@@ -58,6 +62,31 @@ function App() {
           element={
             <ProtectedRoute>
                 <ClothingForm />
+            </ProtectedRoute>
+          }
+        />
+        {/* Outfits */}
+        <Route
+          path="/outfits"
+          element={
+            <ProtectedRoute>
+              <OutfitList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/outfits/new"
+          element={
+            <ProtectedRoute>
+              <OutfitForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/outfits/:id"
+          element={
+            <ProtectedRoute>
+              <OutfitForm />
             </ProtectedRoute>
           }
         />
