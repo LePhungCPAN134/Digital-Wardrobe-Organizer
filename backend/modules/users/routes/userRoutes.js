@@ -202,4 +202,4 @@ usersRoute.delete("/accounts/:id", authorize(["admin"]), async (req, res) => {
   }
 );
 
-module.exports = { usersRoute };
+module.exports = usersRoute;

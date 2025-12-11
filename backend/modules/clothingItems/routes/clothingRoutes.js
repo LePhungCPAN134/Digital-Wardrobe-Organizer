@@ -1,8 +1,7 @@
 const { Router } = require("express");
-const ClothingModel = require("../models/clothingModel");
+const { ClothingModel } = require("../models/clothingModel");
 const createClothingRules = require("../middlewares/create-clothing-rules");
 const updateClothingRules = require("../middlewares/update-clothing-rules");
-const validationResult = require("express-validator");
 const authorize = require("../../../shared/middlewares/authorize");
 
 const clothingRoute = Router();
@@ -12,9 +11,9 @@ const clothingRoute = Router();
  * Protected: customer or admin
  */
 clothingRoute.get("/clothingItems", authorize(["customer", "admin"]), async (req, res) => {
-    const allClothing = await ClothingModel.find();
-    if (!allClothing) res.json([]);
-    else res.json(allClothing);
+    const allClothings = await ClothingModel.find();
+    if (!allClothings) res.json([]);
+    else res.json(allClothings);
 });
 
 /**
@@ -42,6 +41,7 @@ clothingRoute.post("/clothingItems", authorize(["customer", "admin"]), createClo
         imageUrl,
       });
       const savedClothing = await clothing.save();
+      res.status(201).json(savedClothing);
     } catch (error) {
       console.error("Error creating clothing: ", error);
       res.status(500).send("Failed to create new clothing data!");
@@ -55,7 +55,8 @@ clothingRoute.post("/clothingItems", authorize(["customer", "admin"]), createClo
  */
 clothingRoute.put(
   "/clothingItems/:id", authorize(["customer", "admin"]), updateClothingRules, async (req, res) => {
-  try {
+    const clothingID = req.params.id;
+    try {
     const updatedClothing = await ClothingModel.findByIdAndUpdate (
       clothingID,
       req.body,
@@ -91,4 +92,4 @@ clothingRoute.delete("/clothingItems/:id", authorize(["customer", "admin"]), asy
   }
 });
 
-module.exports = { clothingRoute };
+module.exports = clothingRoute;

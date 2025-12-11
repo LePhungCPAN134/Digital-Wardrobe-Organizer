@@ -1,10 +1,9 @@
 const { Router } = require("express");
 const createOutfitRules = require("../middlewares/create-outfit-rules");
 const updateOutfitRules = require("../middlewares/update-outfit-rules");
-const { validationResult } = require("express-validator");
 const authorize = require("../../../shared/middlewares/authorize");
 
-const OutfitModel = require("../models/outfitModel");
+const { OutfitModel } = require("../models/outfitModel");
 const outfitRoute = Router();
 
 /**
@@ -38,6 +37,7 @@ outfitRoute.post("/outfits", authorize(["customer", "admin"]), createOutfitRules
       occasion,
     });
     const savedOutfit = await outfit.save();
+    res.status(201).json(savedOutfit);
   } catch (error) {
     console.erro("Error creating outfit: ", error);
     res.status(500).send("Failed to create new outfit!");
@@ -58,6 +58,7 @@ outfitRoute.put("/outfits/:id", authorize(["customer", "admin"]), updateOutfitRu
     if (!updatedOutfit) {
       return res.status(404).send("Outfit not found!");
     }
+    res.status(200).json(updatedOutfit);
   } catch (error) {
     console.error("Error updating outfit: ", error)
     res.status(500).send("Failed to update outfit data!")
@@ -81,4 +82,4 @@ outfitRoute.delete("/outfits/:id", authorize(["customer", "admin"]), async (req,
   }
 });
 
-module.exports = { outfitRoute };
+module.exports = outfitRoute;

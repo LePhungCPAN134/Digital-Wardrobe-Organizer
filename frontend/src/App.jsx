@@ -30,9 +30,11 @@ function App() {
       </nav>
 
       <Routes>
+        {/* public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/verify-otp" element={<OtpPage />} />
 
+        {/* protected routes */}
         <Route
           path="/clothing"
           element={
@@ -41,19 +43,24 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* reate new clothing */}
         <Route
           path="/clothing/new"
           element={
             <ProtectedRoute>
-              {isAdmin ? (
                 <ClothingForm />
-              ) : (
-                <p>You must be admin to add clothing.</p>
-              )}
             </ProtectedRoute>
           }
         />
-        {/* add other protected routes here */}
+        {/* edit existing clothing */}
+        <Route
+          path="/clothing/:id"
+          element={
+            <ProtectedRoute>
+                <ClothingForm />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );

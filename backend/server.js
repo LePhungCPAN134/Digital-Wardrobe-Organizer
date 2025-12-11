@@ -4,10 +4,11 @@ require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const { userRoutes } = require("../backend/modules/users/routes/userRoutes");
-const clothingRoutes = require("../backend/modules/clothingItems/routes/clothingRoutes");
-const outfitRoutes = require("../backend/modules/outfits/routes/outfitRoutes");
-const connectDB = require("../backend/shared/middlewares/connect-db");
+
+const userRoute = require("./modules/users/routes/userRoutes");
+const clothingRoute = require("./modules/clothingItems/routes/clothingRoutes");
+const outfitRoute = require("./modules/outfits/routes/outfitRoutes");
+const connectDB = require("./shared/middlewares/connect-db");
 
 const port = 3000;
 const hostname = "localhost";
@@ -27,9 +28,9 @@ server.use(cookieParser());
 server.use(connectDB);
 
 //Mount all the routes
-server.use(userRoutes);
-server.use(clothingRoutes);
-server.use(outfitRoutes);
+server.use(userRoute);
+server.use(clothingRoute);
+server.use(outfitRoute);
 
 // error-handling middleware to logs the error for debugging.
 server.use((error, req, res, next) => {

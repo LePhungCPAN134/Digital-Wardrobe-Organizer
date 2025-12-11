@@ -3,8 +3,6 @@ const mongoose = require("mongoose");
 const DB_URL = process.env.DB_URL;
 const DB_NAME = process.env.DB_NAME;
 
-console.log(dbUrl);
-
 async function connectDB(req, res, next) {
     try {
         await mongoose.connect(DB_URL, { dbName: DB_NAME });
